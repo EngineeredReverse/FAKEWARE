@@ -269,10 +269,13 @@ inline void CSlider<T>::Paint(int t_x, int t_y, float* controlheight)
 	int valueX = tl.x + ((*m_val - m_min) * width / (m_max - m_min));
 
 	if (m_val != nullptr && m_hover && InputSys::Get().IsKeyDown(VK_LBUTTON))
-		*m_val = (cur_x - tl.x) * (m_max - m_min) / width;
-
-	if (*m_val < m_min) *m_val = m_min;
-	if (*m_val > m_max) *m_val = m_max;
+	{
+		const auto delta = (cur_x - tl.x);
+		const auto multiplier = delta / static_cast<float>(width);
+		*m_val = static_cast<T>(std::max(static_cast<float>(m_min),
+		                                 std::min(static_cast<float>(m_max),
+		                                          static_cast<float>(multiplier * (m_max - m_min) + m_min))));
+	}
 
 	Draw::FilledRectangle(tl.x, tl.y + 3, br.x, br.y - 3, Color(237));
 	Draw::FilledRectangle(tl.x, tl.y + 3, valueX, br.y - 3, Color(180, 0, 0));
